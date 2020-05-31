@@ -1,4 +1,4 @@
-SRCS = snake.cpp
+SRCS = main.cc snake.cc grid.cc
 CC=g++
 CFLAGS = -g -Wall -std=c++11
 LDFLAGS =
