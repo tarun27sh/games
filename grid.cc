@@ -4,6 +4,7 @@
 
 #include<iostream>
 #include "grid.h"
+#include <ncurses.h>
 
 Grid::Grid () 
 {
@@ -50,7 +51,26 @@ bool Grid::isFood(std::pair<int,int> objectLocation) {
     }
     return false;
 }
+
+/* grid with cout */
 void Grid::draw(std::deque<std::pair<int,int>> coor) {
+    system("clear");
+    for(int i=0; i< gridSize; ++i) {
+        for(int j=0; j< gridSize; ++j) {
+            if (isUserObjAtThisPoint(coor, i, j)) {
+                std::cout << " =>";
+            } else if (isFood(std::make_pair(i,j))) {
+                std::cout << " FOOD ";
+            } else {
+                std::cout << " . ";
+            }
+        }
+        std::cout <<  std::endl;
+    }
+    std::cout <<  std::endl;
+}
+/* create another with ncureses */
+void Grid::draw_v2(std::deque<std::pair<int,int>> coor) {
     system("clear");
     for(int i=0; i< gridSize; ++i) {
         for(int j=0; j< gridSize; ++j) {

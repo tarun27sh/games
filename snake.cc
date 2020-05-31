@@ -1,40 +1,43 @@
-#include <iostream>
-#include <unistd.h>
-#include <stdlib.h>
-#include <vector>
-#include <deque>
+#include "./snake.h"
+
 #include <sys/epoll.h>
 #include <sys/timerfd.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
 
-#include "snake.h"
-using namespace std;    // remove
+#include <iostream>
+#include <vector>
+#include <deque>
 
 Snake::Snake() {
     snakePosition.push_back(std::make_pair(0, 0));
 }
 void Snake::nextStep(Ops op) {
-    switch(op) {
+    switch (op) {
         case Ops::Fwd: {
                            auto head = this->snakePosition.front();
                            this->snakePosition.pop_back();
-                           this->snakePosition.push_front(std::make_pair(head.first, head.second+1));
+                           this->snakePosition.push_front(
+                                    std::make_pair(head.first, head.second+1));
                            break;
                        }
         case Ops::Right: {
                              auto head = this->snakePosition.front();
                              this->snakePosition.pop_back();
-                             this->snakePosition.push_front(std::make_pair(head.first+1, head.second));
+                             this->snakePosition.push_front(
+                                    std::make_pair(head.first+1, head.second));
                              break;
                          }
         case Ops::Left: {
                             auto head = this->snakePosition.front();
                             this->snakePosition.pop_back();
-                            this->snakePosition.push_front(std::make_pair(head.first-1, head.second));
+                            this->snakePosition.push_front(
+                                    std::make_pair(head.first-1, head.second));
                             break;
                         }
         default:
-                        printf("invalid move\n");
+                        std::cout << "invalid move" << std::endl;
     }
 
     this->draw();
@@ -43,8 +46,10 @@ void Snake::nextStep(Ops op) {
 }
 
 void Snake::grow() {
-    std::pair<int,int> lastDotLoc = snakePosition[snakePosition.size() -1];
-    snakePosition.push_back(std::make_pair(lastDotLoc.first, lastDotLoc.second+1));
+    std::pair<int, int> lastDotLoc =
+                    snakePosition[snakePosition.size() -1];
+    snakePosition.push_back(std::make_pair(lastDotLoc.first,
+                            lastDotLoc.second+1));
 }
 
 int Snake::getInput() {
@@ -54,7 +59,7 @@ int Snake::getInput() {
     if (read(STDIN_FILENO, &ch, 1) == -1) {
         perror("read error");
     }
-    printf("read: %d\n", ch);
+    std::cout << "read: " << ch <<  std::endl;
     return ch;
 }
 
@@ -63,7 +68,7 @@ void Snake::draw() {
     grid.draw(this->snakePosition);
 }
 
-/* never return from this function */ 
+/* never return from this function */
 void Snake::gameLoop() {
     int key;
 #define MAX_EVENTS 2
@@ -78,8 +83,8 @@ void Snake::gameLoop() {
     /* user input */
     ev.events = EPOLLIN;
     ev.data.fd = STDIN_FILENO;
-    //int flags = fcntl(ev.data.fd, F_GETFL, 0);
-    //fcntl(ev.data.fd, F_SETFL, flags | O_NONBLOCK);
+    // int flags = fcntl(ev.data.fd, F_GETFL, 0);
+    // fcntl(ev.data.fd, F_SETFL, flags | O_NONBLOCK);
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, STDIN_FILENO, &ev) == -1) {
         perror("epoll_create1");
         exit(1);
@@ -94,8 +99,8 @@ void Snake::gameLoop() {
     }
     ev.events = EPOLLIN;
     ev.data.fd = timer_fd;
-    //int flags = fcntl(ev.data.fd, F_GETFL, 0);
-    //fcntl(ev.data.fd, F_SETFL, flags | O_NONBLOCK);
+    // int flags = fcntl(ev.data.fd, F_GETFL, 0);
+    // fcntl(ev.data.fd, F_SETFL, flags | O_NONBLOCK);
     if (epoll_ctl(epollfd, EPOLL_CTL_ADD, timer_fd, &ev) == -1) {
         perror("epoll_create1");
         exit(1);
@@ -111,28 +116,28 @@ void Snake::gameLoop() {
     }
 
     /* requires user to press arrow and then enter */
-    printf("start game!!!\n");
+    std::cout << "start game!!!" << std::endl;
     while (true) {
-        //usleep(100000);
+        // usleep(100000);
         nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
         for (auto n = 0; n < nfds; ++n) {
             if (events[n].data.fd == STDIN_FILENO) {
-                printf("input detected!\n");  // yes, else epoll keeps on notifying :)
+                // yes, else epoll keeps on notifying :)
+                std::cout << "input detected!" << std::endl;
                 key = getInput();
-                if(key == 68) {         // left
+                if (key == 68) {         // left
                     this->nextStep(Ops::Left);
                 } else if (key == 67) {        // right
                     this->nextStep(Ops::Right);
                 } else {
                     this->nextStep(Ops::Fwd);
                 }
-                printf("keyboard event\n");
-            } else if (events[n].data.fd == timer_fd) { 
+                std::cout << "keyboard event" << std::endl;
+            } else if (events[n].data.fd == timer_fd) {
                 this->nextStep(Ops::Fwd);
-                printf("clock event\n");
+                std::cout << "clock event\n" << std::endl;
             }
-            printf("#events=%d\n", nfds);
+            std::cout << "#events=%d" <<  nfds << std::endl;
         }
     }
-
 }

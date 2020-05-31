@@ -15,4 +15,5 @@ class Grid {
         int getRandom();
         bool isFood(std::pair<int,int> objectLocation);
         void draw(std::deque<std::pair<int,int>> coor);
+        void draw_v2(std::deque<std::pair<int,int>> coor);
 };
