@@ -8,17 +8,14 @@
  *
  */
 
+#include <stdio.h>
+#include <time.h>
 #include<iostream>
 #include <stdint.h>
 
+
 #include "grid_ncurses.h"
-
-//#include "easylogging++.h"
-#define LOG(...) do { \
-    fprintf(stderr, __VA_ARGS__); \
-    } while (0)
-
-//INITIALIZE_EASYLOGGINGPP
+#include "logger.h"
 
 const int window_width = 30;
 const int window_height = 30;

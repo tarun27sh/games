@@ -12,7 +12,8 @@ all:$(PROGS)
 
 snake:
 	$(CC) -g $(SRCS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ 
-	#$(CC) -g $(SRCS) -o $@ $(CFLAGS) $(LDFLAGS) $(LDLIBS)
+	# get preprocessed file
+	#$(CC) -E $(SRCS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) > $@.i
 
 clean:
 	$(RM) $(PROGS) *core*

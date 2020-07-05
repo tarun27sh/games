@@ -1,4 +1,5 @@
 #include "./snake.h"
+#include "logger.h"
 
 #include <sys/epoll.h>
 #include <sys/timerfd.h>
@@ -10,10 +11,6 @@
 #include <vector>
 #include <deque>
 #include <ncurses.h>
-
-#define LOG(...) do { \
-    fprintf(stderr, __VA_ARGS__); \
-} while (0)
 
 Snake::Snake() {
     snakePosition.push_back(grid.getRandomPoints());
@@ -140,7 +137,7 @@ void Snake::gameLoop() {
             } else if (events[n].data.fd == timer_fd) {
                 long int timersElapsed = 0;
                 ssize_t rc = read(timer_fd, &timersElapsed, 8);
-                LOG("read returned %lu\n", rc);
+                LOG("Timer: read returned %lu\n", rc);
                 this->nextStep(lastKey);
             }
         }
