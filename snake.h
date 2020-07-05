@@ -1,5 +1,5 @@
 #include <deque>
-#include "grid.h"
+#include "grid_ncurses.h"
 enum class Ops {
     Fwd,
     Left,
@@ -8,13 +8,13 @@ enum class Ops {
 class Snake {
     private:
         std::deque<std::pair<int, int>> snakePosition;
-        Grid grid;
-        void nextStep(Ops op);
+        NcursesGrid grid;
+        void nextStep(uint16_t key);
         void grow();
         int getInput();
     public:
         Snake();
-        void draw();
+        void draw(uint16_t ch);
 
         /* never return from this function */ 
         void gameLoop();

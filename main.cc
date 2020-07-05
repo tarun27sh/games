@@ -1,3 +1,4 @@
+#include<stdint.h>
 #include "snake.h"
 
 int main() {

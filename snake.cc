@@ -9,38 +9,50 @@
 #include <iostream>
 #include <vector>
 #include <deque>
+#include <ncurses.h>
+
+#define LOG(...) do { \
+    fprintf(stderr, __VA_ARGS__); \
+} while (0)
 
 Snake::Snake() {
-    snakePosition.push_back(std::make_pair(0, 0));
+    snakePosition.push_back(grid.getRandomPoints());
+    snakePosition.push_back(std::make_pair(snakePosition[0].first+1, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first+2, snakePosition[0].second));
 }
-void Snake::nextStep(Ops op) {
-    switch (op) {
-        case Ops::Fwd: {
-                           auto head = this->snakePosition.front();
-                           this->snakePosition.pop_back();
-                           this->snakePosition.push_front(
-                                    std::make_pair(head.first, head.second+1));
+void Snake::nextStep(uint16_t key) {
+    auto head = this->snakePosition.front();
+    auto tail = this->snakePosition.back();
+    switch (key) {
+        case KEY_UP: {
+                            this->snakePosition.pop_front();
+                            this->snakePosition.push_back(
+                            std::make_pair(tail.first, head.second+1));
                            break;
                        }
-        case Ops::Right: {
-                             auto head = this->snakePosition.front();
+        case KEY_DOWN: {
+                           this->snakePosition.pop_front();
+                           this->snakePosition.push_back(
+                                    std::make_pair(tail.first, head.second-1));
+                           break;
+                       }
+        case KEY_RIGHT: {
                              this->snakePosition.pop_back();
                              this->snakePosition.push_front(
                                     std::make_pair(head.first+1, head.second));
                              break;
                          }
-        case Ops::Left: {
-                            auto head = this->snakePosition.front();
+        case KEY_LEFT: {
                             this->snakePosition.pop_back();
                             this->snakePosition.push_front(
                                     std::make_pair(head.first-1, head.second));
                             break;
                         }
         default:
-                        std::cout << "invalid move" << std::endl;
+                       return;
     }
 
-    this->draw();
+    this->draw(key); // use enum, expose to grid_ncruses.h
     if (grid.isFood(snakePosition[0]))
         this->grow();
 }
@@ -64,13 +76,14 @@ int Snake::getInput() {
 }
 
 
-void Snake::draw() {
-    grid.draw(this->snakePosition);
+void Snake::draw(uint16_t ch) {
+    LOG("Sdraw\n");
+    grid.draw(this->snakePosition, ch);
 }
 
 /* never return from this function */
 void Snake::gameLoop() {
-    int key;
+    uint16_t key;
 #define MAX_EVENTS 2
     struct epoll_event ev, events[MAX_EVENTS];
     int epollfd, nfds, timer_fd;
@@ -105,39 +118,31 @@ void Snake::gameLoop() {
         perror("epoll_create1");
         exit(1);
     }
-    int time_in_sec = 1;
-    ts.it_interval.tv_sec = time_in_sec;
-    ts.it_interval.tv_nsec = 0;
-    ts.it_value.tv_sec = time_in_sec;
-    ts.it_value.tv_nsec = 0;
+    ts.it_interval.tv_sec = 0;
+    ts.it_interval.tv_nsec = 100000000;
+    ts.it_value.tv_sec = 0;
+    ts.it_value.tv_nsec = 100000000;
     if (timerfd_settime(timer_fd, TFD_TIMER_ABSTIME, &ts, NULL) == -1) {
         perror("timer_fd settime");
         exit(1);
     }
 
-    /* requires user to press arrow and then enter */
-    std::cout << "start game!!!" << std::endl;
-    while (true) {
-        // usleep(100000);
+    uint16_t lastKey = KEY_RIGHT;
+    while (TRUE)  {
+        //usleep(1000);
         nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
         for (auto n = 0; n < nfds; ++n) {
             if (events[n].data.fd == STDIN_FILENO) {
                 // yes, else epoll keeps on notifying :)
-                std::cout << "input detected!" << std::endl;
-                key = getInput();
-                if (key == 68) {         // left
-                    this->nextStep(Ops::Left);
-                } else if (key == 67) {        // right
-                    this->nextStep(Ops::Right);
-                } else {
-                    this->nextStep(Ops::Fwd);
-                }
-                std::cout << "keyboard event" << std::endl;
+                lastKey = key;
+                key = getch();
+                this->nextStep(key);
             } else if (events[n].data.fd == timer_fd) {
-                this->nextStep(Ops::Fwd);
-                std::cout << "clock event\n" << std::endl;
+                long int timersElapsed = 0;
+                ssize_t rc = read(timer_fd, &timersElapsed, 8);
+                LOG("read returned %lu\n", rc);
+                this->nextStep(lastKey);
             }
-            std::cout << "#events=%d" <<  nfds << std::endl;
         }
     }
 }

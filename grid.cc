@@ -5,28 +5,19 @@
 #include<iostream>
 #include "grid.h"
 #include <ncurses.h>
+#include<cstdint>
 
+const int gridSize=50;
 Grid::Grid () 
 {
     /* randomly generate after 1st one gets eaten */
+    //int _grid[gridSize][gridSize] = {'.'};
     this->foodLocation = std::make_pair(0,5);
     //fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
+    /* initialize ncurses */
 }
-void Grid::draw(int x, int y) {
-    x = x%gridSize;
-    y=y%gridSize;
-    system("clear");
-    for(int i=0; i< gridSize; ++i) {
-        for(int j=0; j< gridSize; ++j) {
-            if (i==x && j==y) {
-                std::cout << " =>";
-            } else
-                std::cout << " . ";
-        }
-        std::cout <<  std::endl;
-    }
-    std::cout <<  std::endl;
-}
+
+
 bool Grid::isUserObjAtThisPoint(std::deque<std::pair<int,int>> coor, int i, int j) {
     for (auto& c: coor) {
         if ((c.first%gridSize == i) && (c.second%gridSize == j)) {
@@ -35,12 +26,15 @@ bool Grid::isUserObjAtThisPoint(std::deque<std::pair<int,int>> coor, int i, int 
     }
     return false;
 }
+
 bool Grid::isFoodHere(int i, int j) {
     return false;
 }
+
 int Grid::getRandom() {
     return 0;
 }
+
 bool Grid::isFood(std::pair<int,int> objectLocation) {
     int x = objectLocation.first % gridSize;
     int y = objectLocation.second % gridSize;
@@ -53,7 +47,9 @@ bool Grid::isFood(std::pair<int,int> objectLocation) {
 }
 
 /* grid with cout */
-void Grid::draw(std::deque<std::pair<int,int>> coor) {
+// make it virtual
+// make child class for grid implementing these functions
+void Grid::draw(std::deque<std::pair<int,int>> coor, uint8_t op) {
     system("clear");
     for(int i=0; i< gridSize; ++i) {
         for(int j=0; j< gridSize; ++j) {
@@ -69,20 +65,4 @@ void Grid::draw(std::deque<std::pair<int,int>> coor) {
     }
     std::cout <<  std::endl;
 }
-/* create another with ncureses */
-void Grid::draw_v2(std::deque<std::pair<int,int>> coor) {
-    system("clear");
-    for(int i=0; i< gridSize; ++i) {
-        for(int j=0; j< gridSize; ++j) {
-            if (isUserObjAtThisPoint(coor, i, j)) {
-                std::cout << " =>";
-            } else if (isFood(std::make_pair(i,j))) {
-                std::cout << " FOOD ";
-            } else {
-                std::cout << " . ";
-            }
-        }
-        std::cout <<  std::endl;
-    }
-    std::cout <<  std::endl;
-}
+
