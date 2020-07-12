@@ -14,9 +14,19 @@
 
 Snake::Snake() {
     snakePosition.push_back(grid.getRandomPoints());
-    snakePosition.push_back(std::make_pair(snakePosition[0].first+1, snakePosition[0].second));
-    snakePosition.push_back(std::make_pair(snakePosition[0].first+2, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-1, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-2, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-3, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-4, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-5, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-6, snakePosition[0].second));
+    snakePosition.push_back(std::make_pair(snakePosition[0].first-7, snakePosition[0].second));
 }
+
+/* 
+ * Based on the key, change snake shape and
+ * pass on the grid for print 
+ */
 void Snake::nextStep(uint16_t key) {
     auto head = this->snakePosition.front();
     auto tail = this->snakePosition.back();
@@ -24,13 +34,23 @@ void Snake::nextStep(uint16_t key) {
         case KEY_UP: {
                             this->snakePosition.pop_front();
                             this->snakePosition.push_back(
-                            std::make_pair(tail.first, head.second+1));
+                            std::make_pair(tail.first, tail.second-1));
+                         /*
+                             this->snakePosition.pop_back();
+                             this->snakePosition.push_front(
+                                    std::make_pair(head.first, head.second+1));
+                            */
                            break;
                        }
         case KEY_DOWN: {
                            this->snakePosition.pop_front();
                            this->snakePosition.push_back(
-                                    std::make_pair(tail.first, head.second-1));
+                                    std::make_pair(tail.first, tail.second+1));
+                           /*
+                             this->snakePosition.pop_back();
+                             this->snakePosition.push_front(
+                                    std::make_pair(head.first, head.second-1));
+                                    */
                            break;
                        }
         case KEY_RIGHT: {
@@ -74,7 +94,7 @@ int Snake::getInput() {
 
 
 void Snake::draw(uint16_t ch) {
-    LOG("Sdraw\n");
+    //LOG("Sdraw\n");
     grid.draw(this->snakePosition, ch);
 }
 
@@ -128,11 +148,18 @@ void Snake::gameLoop() {
     while (TRUE)  {
         //usleep(1000);
         nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+        LOG("NofEvents: %d\n", nfds);
         for (auto n = 0; n < nfds; ++n) {
             if (events[n].data.fd == STDIN_FILENO) {
                 // yes, else epoll keeps on notifying :)
                 lastKey = key;
                 key = getch();
+                if (key == lastKey) {
+                    continue; // ignore if same direction
+                    // Ah, it also helps keeping snake speed in control
+                    // since otherwise it speeds up with multiple events
+                    // triggered if key is kept pressed
+                }
                 this->nextStep(key);
             } else if (events[n].data.fd == timer_fd) {
                 long int timersElapsed = 0;

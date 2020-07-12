@@ -87,7 +87,8 @@ void create_box(WIN *p_win, bool flag)
 void 
 update_box (WIN *p_win, bool flag, std::deque<std::pair<int, int>>& xydeq)
 {    
-    LOG("update\n");
+    char numbers[] = {'0','1','2','3','4','5','6','7','8','9'};
+    //LOG("update\n");
     int i, j;
     int x, y, w, h;
 
@@ -98,17 +99,21 @@ update_box (WIN *p_win, bool flag, std::deque<std::pair<int, int>>& xydeq)
 
     /* clear box, keep border */
     // or better clear deque points, and re create them
+    for (auto i: xydeq) {
+        LOG("____%d,%d\n", i.first, i.second);
+    }
     LOG("x=%d, y=%d, w=%d, h=%d\n", x,y,w,h);
     for(j = y+1; j <= y + h - 1; ++j)
         for(i = x + 1; i <= x + 2*w -1 ; ++i)
             mvaddch(j, i, ' ');
     if(flag == TRUE) {    
         /* draw character ?? */
+        int cntr=0;
         for (auto i: xydeq) {
-            mvaddch(i.second, i.first, '1');
+            mvaddch(i.second, i.first, numbers[cntr==9? 0:cntr++]);
         }
     }
-    LOG("refresh to update\n");
+    //LOG("refresh to update\n");
     refresh();
 }
 
@@ -175,7 +180,8 @@ NcursesGrid::getRandomPoints()
 void NcursesGrid::draw(std::deque<std::pair<int,int>>& coor, uint16_t ch) 
 {
     WIN *win = this->win;
-    LOG("Ndraw\n");
+    // LOG("Ndraw, deq size=%lu\n", coor.size());
+    //std::pair<int,int> init_value = coor.first();
     switch(ch)
     {    
         case KEY_LEFT:
