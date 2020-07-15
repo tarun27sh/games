@@ -26,5 +26,5 @@ class NcursesGrid: public Grid {
         NcursesGrid ();
         ~NcursesGrid ();
         std::pair<int, int> getRandomPoints();
-        void draw(std::deque<std::pair<int,int>>& coor, uint16_t ch);
+        void draw(std::deque<std::pair<int,int>>& coor, uint16_t ch, std::pair<int,int>& foodxy);
 };

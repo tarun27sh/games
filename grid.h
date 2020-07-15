@@ -10,9 +10,11 @@ class Grid {
         int grid[gridSize][gridSize];
     public:
         Grid ();
-        bool isUserObjAtThisPoint(std::deque<std::pair<int,int>> coor, int i, int j);
+        bool isUserObjAtThisPoint(std::deque<std::pair<int,int>> coor, 
+                                  int i, int j);
         bool isFoodHere(int i, int j);
         int getRandom();
-        bool isFood(std::pair<int,int> objectLocation);
+        bool isFood(std::deque<std::pair<int,int>> coor, 
+                    std::pair<int,int> foodxy);
         virtual void draw(std::deque<std::pair<int,int>> coor, uint8_t op);
 };

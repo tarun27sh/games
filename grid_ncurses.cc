@@ -17,12 +17,13 @@
 #include "grid_ncurses.h"
 #include "logger.h"
 
-const int window_width = 30;
+const int window_width = 40;
 const int window_height = 30;
 
 void init_win_params(WIN *p_win);
 void print_win_params(WIN *p_win);
-void update_box(WIN *win, bool flag, std::deque<std::pair<int, int>>& xydeq);
+void update_box(WIN *win, bool flag, std::deque<std::pair<int, int>>& xydeq, 
+                std::pair<int, int>& foodxy);
 
 void init_win_params(WIN *p_win)
 {
@@ -85,7 +86,8 @@ void create_box(WIN *p_win, bool flag)
 }
 
 void 
-update_box (WIN *p_win, bool flag, std::deque<std::pair<int, int>>& xydeq)
+update_box (WIN *p_win, bool flag, std::deque<std::pair<int, int>>& xydeq,
+            std::pair<int, int>& foodxy)
 {    
     char numbers[] = {'0','1','2','3','4','5','6','7','8','9'};
     //LOG("update\n");
@@ -110,9 +112,10 @@ update_box (WIN *p_win, bool flag, std::deque<std::pair<int, int>>& xydeq)
         /* draw character ?? */
         int cntr=0;
         for (auto i: xydeq) {
-            mvaddch(i.second, i.first, numbers[cntr==9? 0:cntr++]);
+            mvaddch(i.second, i.first, numbers[cntr++%10]);
         }
     }
+    mvaddch(foodxy.second, foodxy.first, 'F');
     //LOG("refresh to update\n");
     refresh();
 }
@@ -173,11 +176,15 @@ NcursesGrid::~NcursesGrid ()
 std::pair<int, int>
 NcursesGrid::getRandomPoints()
 {
-    return std::make_pair(this->win->startx+5, this->win->starty+5);
+    auto randx = rand()%this->win->width + this->win->startx ;
+    auto randy = rand()% this->win->height + this->win->starty ;
+    LOG("randome=(%d,%d)\n", randx, randy);
+    return std::make_pair(randx, randy);
 }
 
 
-void NcursesGrid::draw(std::deque<std::pair<int,int>>& coor, uint16_t ch) 
+void NcursesGrid::draw(std::deque<std::pair<int,int>>& coor, uint16_t ch, 
+                      std::pair<int,int>& foodxy) 
 {
     WIN *win = this->win;
     // LOG("Ndraw, deq size=%lu\n", coor.size());
@@ -226,6 +233,6 @@ void NcursesGrid::draw(std::deque<std::pair<int,int>>& coor, uint16_t ch)
             mvprintw(25, 0, "%d %d %d %d", win->startx, win->starty, 
                     win->width, win->height);
     }
-    update_box(win, TRUE, coor);
+    update_box(win, TRUE, coor, foodxy);
     LOG("key: %u\n", ch);
 }

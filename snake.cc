@@ -20,7 +20,7 @@ Snake::Snake() {
     snakePosition.push_back(std::make_pair(snakePosition[0].first-4, snakePosition[0].second));
     snakePosition.push_back(std::make_pair(snakePosition[0].first-5, snakePosition[0].second));
     snakePosition.push_back(std::make_pair(snakePosition[0].first-6, snakePosition[0].second));
-    snakePosition.push_back(std::make_pair(snakePosition[0].first-7, snakePosition[0].second));
+    this->foodxy = std::make_pair(snakePosition[0].first + 3, snakePosition[0].second);
 }
 
 /* 
@@ -70,14 +70,18 @@ void Snake::nextStep(uint16_t key) {
     }
 
     this->draw(key); // use enum, expose to grid_ncruses.h
-    if (grid.isFood(snakePosition[0]))
+    if (grid.isFood(this->snakePosition, this->foodxy)) {
         this->grow();
+        // update this->food locaiton to new x,y - make random intead
+        this->foodxy = 
+            grid.getRandomPoints();
+    }
 }
 
 void Snake::grow() {
     std::pair<int, int> lastDotLoc =
-                    snakePosition[snakePosition.size() -1];
-    snakePosition.push_back(std::make_pair(lastDotLoc.first,
+                    this->snakePosition[this->snakePosition.size() -1];
+    this->snakePosition.push_back(std::make_pair(lastDotLoc.first,
                             lastDotLoc.second+1));
 }
 
@@ -95,7 +99,7 @@ int Snake::getInput() {
 
 void Snake::draw(uint16_t ch) {
     //LOG("Sdraw\n");
-    grid.draw(this->snakePosition, ch);
+    grid.draw(this->snakePosition, ch, this->foodxy);
 }
 
 /* never return from this function */

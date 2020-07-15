@@ -35,13 +35,14 @@ int Grid::getRandom() {
     return 0;
 }
 
-bool Grid::isFood(std::pair<int,int> objectLocation) {
-    int x = objectLocation.first % gridSize;
-    int y = objectLocation.second % gridSize;
-    if ((foodLocation.first == x) && (foodLocation.second == y)) {
-        this->foodLocation.first = getRandom() % gridSize;
-        this->foodLocation.second = getRandom() % gridSize;
-        return true;
+bool Grid::isFood(std::deque<std::pair<int,int>> snakexy, 
+        std::pair<int,int> foodxy) 
+{
+    for (auto i: snakexy) {
+        if (i.first == foodxy.first &&
+                i.second == foodxy.second) {
+            return true;
+        }
     }
     return false;
 }
@@ -55,8 +56,8 @@ void Grid::draw(std::deque<std::pair<int,int>> coor, uint8_t op) {
         for(int j=0; j< gridSize; ++j) {
             if (isUserObjAtThisPoint(coor, i, j)) {
                 std::cout << " =>";
-            } else if (isFood(std::make_pair(i,j))) {
-                std::cout << " FOOD ";
+            //} else if (isFood(std::make_pair(i,j))) {
+            //    std::cout << " FOOD ";
             } else {
                 std::cout << " . ";
             }

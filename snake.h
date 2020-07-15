@@ -9,6 +9,7 @@ class Snake {
     private:
         std::deque<std::pair<int, int>> snakePosition;
         NcursesGrid grid;
+        std::pair<int, int> foodxy;
         void nextStep(uint16_t key);
         void grow();
         int getInput();
