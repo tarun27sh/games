@@ -10,10 +10,16 @@ include_directories(${CURSES_INCLUDE_DIR})
 set (CMAKE_CXX_FLAGS_DEBUG 
     "${CMAKE_CXX_FLAGS_DEBUG}         \
     -Wall -Wextra -Wpedantic -Werror  \
-    -fno-omit-frame-pointer -fsanitize=address")
+    -fno-omit-frame-pointer           \
+    -fsanitize=thread")
+    #    -fsanitize=memory") # not supported by gcc
+    #    -fsanitize=address")
 set (CMAKE_LINKER_FLAGS_DEBUG
     "${CMAKE_LINKER_FLAGS_DEBUG}      \
-    -fno-omit-frame-pointer -fsanitize=address")
+    -fno-omit-frame-pointer           \
+    -fsanitize=thread")
+    #-fsanitize=memory") # not supported by gcc
+    #-fsanitize=address")
 
     add_custom_target(graphviz ALL
     COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
