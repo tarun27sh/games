@@ -42,14 +42,16 @@ void init_win_params(WIN *p_win)
     p_win->border.br = '+';
 
 }
+
+#ifndef _DEBUG
+__attribute__((unused))
+#endif
 void print_win_params(WIN *p_win)
 {
-#ifdef _DEBUG
     mvprintw(25, 0, "%d %d %d %d", p_win->startx, p_win->starty, 
             p_win->width, p_win->height);
     //wrefresh(p_win);
     refresh();
-#endif
 }
 void create_box(WIN *p_win, bool flag)
 {    

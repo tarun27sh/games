@@ -27,10 +27,6 @@ bool Grid::isUserObjAtThisPoint(std::deque<std::pair<int,int>> coor, int i, int 
     return false;
 }
 
-bool Grid::isFoodHere(int i, int j) {
-    return false;
-}
-
 int Grid::getRandom() {
     return 0;
 }
@@ -50,7 +46,8 @@ bool Grid::isFood(std::deque<std::pair<int,int>> snakexy,
 /* grid with cout */
 // make it virtual
 // make child class for grid implementing these functions
-void Grid::draw(std::deque<std::pair<int,int>> coor, uint8_t op) {
+void Grid::draw(std::deque<std::pair<int,int>> coor, 
+        uint8_t op __attribute__((unused))) {
     system("clear");
     for(int i=0; i< gridSize; ++i) {
         for(int j=0; j< gridSize; ++j) {
